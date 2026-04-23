@@ -1,0 +1,1 @@
+sito portfolio creato in circa 10 giorni, creato per mostrare le mie competenze (ps: per chiunque stia leggendo il codice, il sito e' stato pushato tutto insieme su git hub, ci ho lavorato in locale sul mio pc, solo alla fine ho fatto il commit ed il push)
