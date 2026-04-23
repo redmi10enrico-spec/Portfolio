@@ -3,52 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enrico Iorio | Portfolio</title>
+    <title>Enrico Iorio — Front-End Developer</title>
     <link rel="icon" type="image/png" href="fotoprofilo.png">
-    <meta name="description" content="Portfolio professionale di uno sviluppatore Full Stack - Creazione esperienze digitali straordinarie">
-    
-    <!-- Fonts -->
+    <meta name="description" content="Portfolio di Enrico Iorio, Front-End Developer. Siti web moderni, veloci e su misura.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading Screen -->
     <div id="loader" class="loader">
         <div class="loader-content">
-            <div class="loader-text">
-                <span class="loader-letter">L</span>
-                <span class="loader-letter">O</span>
-                <span class="loader-letter">A</span>
-                <span class="loader-letter">D</span>
-                <span class="loader-letter">I</span>
-                <span class="loader-letter">N</span>
-                <span class="loader-letter">G</span>
-            </div>
+            <div class="loader-text">Caricamento...</div>
             <div class="loader-bar">
                 <div class="loader-progress"></div>
             </div>
-            <div class="loader-percentage">0%</div>
         </div>
-        <div class="loader-glow"></div>
     </div>
 
-    <!-- Custom Cursor -->
-    <div class="cursor-follower"></div>
-    <div class="cursor-dot"></div>
+    <div class="bg-gradient"></div>
+    <div class="bg-gradient-alt"></div>
 
     <!-- Navigation -->
     <nav class="nav" id="nav">
@@ -89,375 +65,266 @@
     <!-- Main Content -->
     <main class="main">
         
-        <!-- HERO SECTION -->
         <section id="hero" class="hero">
-            <div class="hero-bg" id="heroBg"></div>
-            <div class="hero-particles" id="particles"></div>
-            
             <div class="hero-content">
-                <div class="hero-badge" data-reveal>
+                <div class="hero-badge">
                     <span class="badge-dot"></span>
                     <span class="badge-text">Disponibile per nuovi progetti</span>
                 </div>
-                
+
                 <h1 class="hero-title">
-                    <span class="title-line" data-reveal>
-                        <span class="title-word">Full Stack</span>
-                    </span>
-                    <span class="title-line" data-reveal>
-                        <span class="title-word title-highlight">Developer</span>
-                    </span>
+                    <span class="title-line">Enrico Iorio</span>
+                    <span class="title-line title-highlight">Front-End Developer</span>
                 </h1>
-                
-                <p class="hero-subtitle" data-reveal>
-                    Trasformo idee complesse in esperienze digitali straordinarie.<br>
-                    Codice pulito, design impeccabile, performance ottimali.
+
+                <p class="hero-subtitle">
+                    Sviluppo siti web moderni, performanti e su misura.<br>
+                    Specializzato in HTML, CSS, JavaScript e interfacce intuitive.
                 </p>
-                
-                <div class="hero-cta" data-reveal>
-                    <a href="#projects" class="btn btn-primary">
-                        <span class="btn-text">Esplora i Progetti</span>
-                        <span class="btn-icon">
-                            <i data-lucide="arrow-right"></i>
-                        </span>
-                    </a>
-                    <a href="#contact" class="btn btn-outline">
-                        <span class="btn-text">Contattami</span>
-                    </a>
+
+                <div class="hero-cta">
+                    <a href="#projects" class="btn btn-primary">Vedi i progetti</a>
+                    <a href="#contact" class="btn btn-outline">Contattami</a>
                 </div>
             </div>
-            
-            <div class="hero-scroll-indicator">
-                <div class="scroll-mouse">
-                    <div class="scroll-wheel"></div>
-                </div>
-                <span class="scroll-text">Scorri per esplorare</span>
-            </div>
-            
+
             <div class="hero-stats">
-                <div class="stat-item" data-reveal>
-                    <span class="stat-number" data-count="7">0</span>
-                    <span class="stat-suffix">+</span>
-                    <span class="stat-label">Anni di Esperienza</span>
+                <div class="stat-item">
+                    <span class="stat-number">7+</span>
+                    <span class="stat-label">Anni di esperienza</span>
                 </div>
-                <div class="stat-item" data-reveal>
-                    <span class="stat-number" data-count="50">0</span>
-                    <span class="stat-suffix">+</span>
-                    <span class="stat-label">Progetti Completati</span>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Progetti completati</span>
                 </div>
-                <div class="stat-item" data-reveal>
-                    <span class="stat-number" data-count="30">0</span>
-                    <span class="stat-suffix">+</span>
-                    <span class="stat-label">Clienti Soddisfatti</span>
+                <div class="stat-item">
+                    <span class="stat-number">30+</span>
+                    <span class="stat-label">Clienti soddisfatti</span>
                 </div>
             </div>
         </section>
 
-        <!-- SCROLL TRANSITION SECTION -->
-        <section class="scroll-transition" id="transition">
-            <div class="transition-container">
-                <div class="transition-shape" id="transitionShape">
-                    <div class="shape-layer layer-1"></div>
-                    <div class="shape-layer layer-2"></div>
-                    <div class="shape-layer layer-3"></div>
-                </div>
-                <div class="transition-text">
-                    <h2 class="transition-title">
-                        <span class="transition-word">Innovazione</span>
-                        <span class="transition-word">·</span>
-                        <span class="transition-word">Creatività</span>
-                        <span class="transition-word">·</span>
-                        <span class="transition-word">Precisione</span>
-                    </h2>
-                </div>
-            </div>
-            <div class="transition-glow"></div>
-        </section>
-
-        <!-- SKILLS SECTION -->
         <section id="skills" class="skills">
-            <div class="section-header" data-reveal>
-                <span class="section-eyebrow">Cosa So Fare</span>
-                <h2 class="section-title">Competenze Tecniche</h2>
-                <p class="section-subtitle">Tecnologie moderne per soluzioni all'avanguardia</p>
+            <div class="section-header">
+                <span class="section-eyebrow">Competenze</span>
+                <h2 class="section-title">Tecnologie</h2>
+                <p class="section-subtitle">Strumenti che uso quotidianamente per sviluppare i miei progetti.</p>
             </div>
-            
+
             <div class="skills-container">
                 <div class="skills-grid">
-                    <!-- HTML -->
-                    <div class="skill-card" data-skill="html" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="code-2"></i>
-                        </div>
+                    <div class="skill-card">
                         <h3 class="skill-name">HTML5</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="95"></div>
+                            <div class="skill-progress" style="width: 95%"></div>
                         </div>
                         <span class="skill-percent">95%</span>
-                        <p class="skill-desc">Struttura semantica, accessibilità, SEO optimization</p>
+                        <p class="skill-desc">Semantica, accessibilita, SEO</p>
                     </div>
-                    
-                    <!-- CSS -->
-                    <div class="skill-card" data-skill="css" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="palette"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">CSS3</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="92"></div>
+                            <div class="skill-progress" style="width: 92%"></div>
                         </div>
                         <span class="skill-percent">92%</span>
-                        <p class="skill-desc">Flexbox, Grid, Animazioni, Responsive Design</p>
+                        <p class="skill-desc">Flexbox, Grid, animazioni, responsive</p>
                     </div>
-                    
-                    <!-- JavaScript -->
-                    <div class="skill-card" data-skill="javascript" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="braces"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">JavaScript</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="90"></div>
+                            <div class="skill-progress" style="width: 90%"></div>
                         </div>
                         <span class="skill-percent">90%</span>
-                        <p class="skill-desc">ES6+, DOM Manipulation, Async Programming</p>
+                        <p class="skill-desc">ES6+, DOM, async/await</p>
                     </div>
-                    
-                    <!-- Java -->
-                    <div class="skill-card" data-skill="java" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="coffee"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">Java</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="85"></div>
+                            <div class="skill-progress" style="width: 85%"></div>
                         </div>
                         <span class="skill-percent">85%</span>
-                        <p class="skill-desc">Spring Boot, Microservizi, Enterprise Apps</p>
+                        <p class="skill-desc">Sviluppo plugin Minecraft, backend</p>
                     </div>
-                    
-                    <!-- PHP -->
-                    <div class="skill-card" data-skill="php" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="server"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">PHP</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="88"></div>
+                            <div class="skill-progress" style="width: 88%"></div>
                         </div>
                         <span class="skill-percent">88%</span>
-                        <p class="skill-desc">Laravel, Symfony, RESTful APIs</p>
+                        <p class="skill-desc">Backend, API REST</p>
                     </div>
-                    
-                    <!-- SQL -->
-                    <div class="skill-card" data-skill="sql" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="database"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">SQL</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="87"></div>
+                            <div class="skill-progress" style="width: 87%"></div>
                         </div>
                         <span class="skill-percent">87%</span>
-                        <p class="skill-desc">MySQL, PostgreSQL, Query Optimization</p>
+                        <p class="skill-desc">MySQL, database relazionali</p>
                     </div>
-                    
-                    <!-- Python -->
-                    <div class="skill-card" data-skill="python" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="terminal"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">Python</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="82"></div>
+                            <div class="skill-progress" style="width: 82%"></div>
                         </div>
                         <span class="skill-percent">82%</span>
-                        <p class="skill-desc">Django, Flask, Data Analysis, AI/ML</p>
+                        <p class="skill-desc">Scripting, automazioni, bot</p>
                     </div>
-                    
-                    <!-- React/Vue -->
-                    <div class="skill-card" data-skill="frameworks" data-reveal>
-                        <div class="skill-icon">
-                            <i data-lucide="layers"></i>
-                        </div>
+
+                    <div class="skill-card">
                         <h3 class="skill-name">React / Vue</h3>
                         <div class="skill-bar">
-                            <div class="skill-progress" data-width="89"></div>
+                            <div class="skill-progress" style="width: 89%"></div>
                         </div>
                         <span class="skill-percent">89%</span>
-                        <p class="skill-desc">Component Architecture, State Management</p>
+                        <p class="skill-desc">Componenti, state management</p>
                     </div>
-                </div>
-            </div>
-            
-            <div class="skills-orbit" id="skillsOrbit">
-                <div class="orbit-center">
-                    <span class="orbit-text">Stack</span>
                 </div>
             </div>
         </section>
 
-        <!-- DIVIDER -->
-        <div class="section-divider">
-            <div class="divider-wave"></div>
-        </div>
-
-        <!-- BIO SECTION -->
         <section id="bio" class="bio">
-            <div class="tech-grid"></div>
             <div class="bio-container">
-                <div class="bio-visual" data-reveal>
+                <div class="bio-visual">
                     <div class="bio-image-wrapper">
-                        <div class="bio-image-real img-reveal" data-parallax>
-                            <img src="assets/fotoprofilo.png" alt="Foto Profilo Developer" loading="lazy">
-                            <div class="scan-line"></div>
+                        <div class="bio-image-real">
+                            <img src="assets/fotoprofilo.png" alt="Enrico Iorio">
                         </div>
-                        <div class="bio-image-frame"></div>
                         <div class="corner-bracket corner-bracket-tl"></div>
                         <div class="corner-bracket corner-bracket-tr"></div>
                         <div class="corner-bracket corner-bracket-bl"></div>
                         <div class="corner-bracket corner-bracket-br"></div>
                     </div>
-                    <div class="bio-experience-badge glass-card pulse-glow">
+                    <div class="bio-experience-badge">
                         <span class="exp-number">7+</span>
-                        <span class="exp-text">Anni di<br>Esperienza</span>
+                        <span class="exp-text">Anni di esperienza</span>
                     </div>
                 </div>
-                
+
                 <div class="bio-content">
-                    <div class="section-header" data-reveal>
-                        <span class="section-eyebrow">Chi Sono</span>
-                        <h2 class="section-title">La Mia Storia</h2>
+                    <div class="section-header">
+                        <span class="section-eyebrow">Chi sono</span>
+                        <h2 class="section-title">La mia storia</h2>
                     </div>
-                    
-                    <div class="bio-text" data-reveal>
+
+                    <div class="bio-text">
                         <p class="bio-paragraph">
-                            Sono uno sviluppatore Full Stack appassionato di tecnologia e innovazione. 
-                            Con oltre 7 anni di esperienza nel settore, ho avuto il privilegio di lavorare 
-                            su progetti straordinari per aziende piccole, ma anche per qualcosa di piu' grande.
+                            Sono Enrico Iorio, sviluppatore front-end con sede a Roma. Lavoro nel campo dello sviluppo web dal 2017,
+                            partendo da semplici pagine statiche fino ad arrivare a progetti complessi come server di gioco e applicazioni web.
                         </p>
                         <p class="bio-paragraph">
-                            Parlando un po' di me, io sono Enrico Iorio, appassionato di informatica, Bodybuilding, e Kikboxing.
-                            Lo sport è la mia passione, mi aiuta a mantenere la disciplina e la concentrazione necessarie 
-                            per affrontare ogni sfida con determinazione e costanza. Cio' mi aiuta molto anche per trovare 
-                            idee, ispirazione per i miei progetti e i progetti che mi commissionate.
+                            Al di fuori del codice, pratico bodybuilding e kickboxing da anni. Lo sport mi ha insegnato disciplina,
+                            pazienza e perseveranza — qualita che applico quotidianamente anche nel mio lavoro.
                         </p>
                         <p class="bio-paragraph">
-                            Developer freelancer non per scelta, ma non avendo qualifiche scolastiche, nessuno mi prende a lavorare,
-                            e' questo il brutto di essere un freelancer, ma io credo molto che il mio "lavoro" ne possa valere la pena,
-                            e che un giorno si trasformi in una cosa che mi renda economicamente stabile. Anche per questo motivo
-                            rendo i miei lavori, accessibili anche ai portafogli piu' vuoti, preferisco piu' lavori meno pagati, che un grande lavoro pagato molto,
-                            questo perche' al giorno d'oggi nessuno di fida dei freelancer, per questo e' difficile trovare persone disposte a fidarsi di te.
+                            Lavoro come freelancer perche credo nel rapporto diretto con il cliente. Preferisco fare piu progetti
+                            accessibili economicamente piuttosto che pochi lavori costosi. Il mio obiettivo e costruire
+                            una rete di clienti soddisfatti che si fidano del mio lavoro.
                         </p>
                     </div>
-                    
-                    <div class="bio-highlights" data-reveal>
+
+                    <div class="bio-highlights">
                         <div class="highlight-item">
-                            <i data-lucide="check-circle" class="highlight-icon"></i>
-                            <span>Adattamento alle proprie esigenze</span>
+                            <span class="highlight-check">✓</span>
+                            <span>Siti su misura per ogni budget</span>
                         </div>
                         <div class="highlight-item">
-                            <i data-lucide="check-circle" class="highlight-icon"></i>
-                            <span>Script moderni e sicuri</span>
+                            <span class="highlight-check">✓</span>
+                            <span>Codice pulito e mantenibile</span>
                         </div>
                         <div class="highlight-item">
-                            <i data-lucide="check-circle" class="highlight-icon"></i>
-                            <span>User Experience impeccabile</span>
+                            <span class="highlight-check">✓</span>
+                            <span>Supporto anche dopo la consegna</span>
                         </div>
                     </div>
-                    
-                    <div class="bio-cta" data-reveal>
-                        <a href="#contact" class="btn btn-primary">
-                            <span class="btn-text">Iniziamo un Progetto</span>
-                            <span class="btn-icon">
-                                <i data-lucide="arrow-right"></i>
-                            </span>
-                        </a>
-                    </div>
+
+                    <a href="#contact" class="btn btn-primary">Parliamo del tuo progetto</a>
                 </div>
             </div>
         </section>
 
-        <!-- WORKS SECTION -->
         <section id="works" class="works">
-            <div class="section-header" data-reveal>
+            <div class="section-header">
                 <span class="section-eyebrow">Esperienza</span>
-                <h2 class="section-title">TimeLine Progetti</h2>
-                <p class="section-subtitle">Progetti significativi e collaborazioni importanti, in ordine cronologico.</p>
+                <h2 class="section-title">Progetti e lavori</h2>
+                <p class="section-subtitle">La mia carriera, dal primo esperimento ai progetti attuali.</p>
             </div>
-            
+
             <div class="works-container">
                 <div class="works-timeline">
                     <div class="timeline-line"></div>
-                    
-                    <div class="work-item" data-reveal>
+
+                    <div class="work-item">
                         <div class="work-marker"></div>
-                        <div class="work-card" data-tilt>
-                            <div class="work-period">2026 - Oggi</div>
-                            <h3 class="work-title">Developer per LunarRP</h3>
-                            <p class="work-company">Server Fivem</p>
+                        <div class="work-card">
+                            <div class="work-period">2026 — Oggi</div>
+                            <h3 class="work-title">Developer — LunarRP</h3>
+                            <p class="work-company">Server FiveM</p>
                             <p class="work-description">
-                                Developer per il server FiveM LunarRP, sviluppo di script e plugin per il server,
-                                miglioramento delle performance e ottimizzazione del codice.
+                                Sviluppo script in Lua, gestione database e ottimizzazione performance per un server GTA RP.
                             </p>
                             <div class="work-tags">
                                 <span class="work-tag">Lua</span>
                                 <span class="work-tag">PHP</span>
-                                <span class="work-tag">JavaScript</span>
+                                <span class="work-tag">MySQL</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="work-item" data-reveal>
+
+                    <div class="work-item">
                         <div class="work-marker"></div>
-                        <div class="work-card" data-tilt>
-                            <div class="work-period">2019 - 2025</div>
-                            <h3 class="work-title">Fondatore di ImperialCraft</h3>
+                        <div class="work-card">
+                            <div class="work-period">2019 — 2025</div>
+                            <h3 class="work-title">Founder — ImperialCraft</h3>
                             <p class="work-company">Server Minecraft</p>
                             <p class="work-description">
-                                Founder di ImperialCraft, il progetto che mi ha dato piu soddisfazioni in assoluto,
-                                poiche' grande fan di minecraft, Abbandonato per fallimento economico.
+                                Creatore e gestore di un server Minecraft multimodalita. Plugin custom in Java,
+                                bot Discord, sito web integrato. Chiuso per motivi economici ma esperienza formativa.
                             </p>
                             <div class="work-tags">
                                 <span class="work-tag">Java</span>
                                 <span class="work-tag">Python</span>
-                                <span class="work-tag">Discord.js</span>
+                                <span class="work-tag">Node.js</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="work-item" data-reveal>
+
+                    <div class="work-item">
                         <div class="work-marker"></div>
-                        <div class="work-card" data-tilt>
-                            <div class="work-period">2018 - 2026</div>
-                            <h3 class="work-title">Web Designer</h3>
-                            <p class="work-company">Developer</p>
+                        <div class="work-card">
+                            <div class="work-period">2018 — Oggi</div>
+                            <h3 class="work-title">Web Developer Freelance</h3>
+                            <p class="work-company">Autonomo</p>
                             <p class="work-description">
-                                Creatore di molteplici siti web, per aziende, server, ristoranti
-                                bar, piccole attivita' ecc...
-                            </p>
-                            <div class="work-tags">
-                                <span class="work-tag">HTML</span>
-                                <span class="work-tag">CSS</span>
-                                <span class="work-tag">JavaScript</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="work-item" data-reveal>
-                        <div class="work-marker"></div>
-                        <div class="work-card" data-tilt>
-                            <div class="work-period">2017 - 2018 - Inizio carriera</div>
-                            <h3 class="work-title">Game Developer</h3>
-                            <p class="work-company">Unity 3d</p>
-                            <p class="work-description">
-                                Sviluppo di giochi 3d con Unity 3d, creai pochissimi videogiochi, poiche'
-                                non ero capace a creare modelli 3d, quindi abbandonai dopo poco.
+                                Siti web per attivita commerciali, ristoranti, server di gioco e professionisti.
+                                Dal semplice sito vetrina alle applicazioni piu complesse.
                             </p>
                             <div class="work-tags">
                                 <span class="work-tag">HTML/CSS</span>
+                                <span class="work-tag">JavaScript</span>
                                 <span class="work-tag">PHP</span>
-                                <span class="work-tag">WordPress</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-item">
+                        <div class="work-marker"></div>
+                        <div class="work-card">
+                            <div class="work-period">2017 — 2018</div>
+                            <h3 class="work-title">Primi passi con Unity</h3>
+                            <p class="work-company">Hobby</p>
+                            <p class="work-description">
+                                Prime esperienze di programmazione con Unity 3D. Ho capito che preferisco lo sviluppo web
+                                alla creazione di videogiochi, ma e stato utile per imparare C# e la logica di programmazione.
+                            </p>
+                            <div class="work-tags">
+                                <span class="work-tag">C#</span>
+                                <span class="work-tag">Unity</span>
                             </div>
                         </div>
                     </div>
@@ -465,36 +332,21 @@
             </div>
         </section>
 
-        <!-- PROJECTS SECTION -->
         <section id="projects" class="projects">
-            <div class="section-header" data-reveal>
+            <div class="section-header">
                 <span class="section-eyebrow">Portfolio</span>
-                <h2 class="section-title">Progetti Migliori</h2>
-                <p class="section-subtitle">Una selezione dei miei lavori migliori, Sono solo l'1% di quello che ho fatto...</p>
+                <h2 class="section-title">Alcuni lavori</h2>
+                <p class="section-subtitle">Una selezione dei progetti a cui ho lavorato negli ultimi anni.</p>
             </div>
-            
-            <div class="projects-filter" data-reveal>
-                <button class="filter-btn active" data-filter="all">Tutti</button>
-                <button class="filter-btn" data-filter="web">Web App</button>
-                <button class="filter-btn" data-filter="ecommerce">E-Commerce</button>
-                <button class="filter-btn" data-filter="mobile">Mobile</button>
-                <button class="filter-btn" data-filter="enterprise">Enterprise</button>
-            </div>
-            
+
             <div class="projects-grid">
-                <div class="project-card glass-card" data-category="enterprise" data-reveal data-tilt>
+                <div class="project-card">
                     <div class="project-image-real">
-                        <img src="assets/fotoprofiloIMCT.jpg" alt="IMCT Sito Web" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
-                        </div>
+                        <img src="assets/fotoprofiloIMCT.jpg" alt="ImperialCraft Minecraft Server">
                     </div>
                     <div class="project-content">
                         <h3 class="project-title">ImperialCraft</h3>
-                        <p class="project-desc">Server Minecraft con molte modalita', ottobre 2023 top 20 su Minecraft Italia</p>
+                        <p class="project-desc">Server Minecraft multimodalita con community attiva. Top 20 su Minecraft Italia (ottobre 2023).</p>
                         <div class="project-tags">
                             <span class="project-tag">Java</span>
                             <span class="project-tag">Python</span>
@@ -502,83 +354,58 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="project-card glass-card" data-category="web" data-reveal data-tilt>
+
+                <div class="project-card">
                     <div class="project-image-real">
-                        <img src="assets/fotoIMCTsito.png" alt="CloniX Project" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
-                        </div>
+                        <img src="assets/fotoIMCTsito.png" alt="Sito ImperialCraft">
                     </div>
                     <div class="project-content">
                         <h3 class="project-title">Sito ImperialCraft</h3>
-                        <p class="project-desc">Sito web del server precedentemente descritto</p>
+                        <p class="project-desc">Sito web vetrina per il server con sistema di shop integrato e gestione utenti.</p>
                         <div class="project-tags">
-                            <span class="project-tag">HTML</span>
-                            <span class="project-tag">CSS</span>
+                            <span class="project-tag">HTML/CSS</span>
                             <span class="project-tag">JavaScript</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="project-card glass-card" data-category="enterprise" data-reveal data-tilt>
-                    <div class="project-image-real">
-                        <img src="assets/fotoprofiloLunarRP.png" alt="PC Monitor Setup" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-content">
-                        <h3 class="project-title">LunarRP</h3>
-                        <p class="project-desc">Developer per il server LunarRP, gestito da me e da altri 3 Developer</p>
-                        <div class="project-tags">
-                            <span class="project-tag">Lua</span>
-                            <span class="project-tag">C++</span>
                             <span class="project-tag">PHP</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="project-card glass-card" data-category="enterprise" data-reveal data-tilt>
+
+                <div class="project-card">
                     <div class="project-image-real">
-                        <img src="assets/fotolunarbot.png" alt="IMCT Profile" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
-                        </div>
+                        <img src="assets/fotoprofiloLunarRP.png" alt="LunarRP FiveM">
                     </div>
                     <div class="project-content">
-                        <h3 class="project-title">Bot Discord custom</h3>
-                        <p class="project-desc">Creati molti bot discord custom, con funzionalità personalizzate, e un'intelligenza artificiale all'interno</p>
+                        <h3 class="project-title">LunarRP</h3>
+                        <p class="project-desc">Sviluppo script e gestione tecnica per server GTA RP su FiveM.</p>
                         <div class="project-tags">
-                            <span class="project-tag">JavaScript</span>
-                            <span class="project-tag">SQL</span>
-                            <span class="project-tag">API</span>
+                            <span class="project-tag">Lua</span>
+                            <span class="project-tag">PHP</span>
+                            <span class="project-tag">MySQL</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="project-card glass-card" data-category="mobile" data-reveal data-tilt>
+
+                <div class="project-card">
                     <div class="project-image-real">
-                        <img src="assets/fotoCloniX.png" alt="PC Workstation" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
+                        <img src="assets/fotolunarbot.png" alt="Bot Discord">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Bot Discord</h3>
+                        <p class="project-desc">Bot personalizzati con moderazione automatica, musica e comandi custom per community.</p>
+                        <div class="project-tags">
+                            <span class="project-tag">JavaScript</span>
+                            <span class="project-tag">Node.js</span>
                         </div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image-real">
+                        <img src="assets/fotoCloniX.png" alt="CloniX Social">
                     </div>
                     <div class="project-content">
                         <h3 class="project-title">CloniX</h3>
-                        <p class="project-desc">Social Media, dove puoi "matchare" persone con i vostri stessi interessi. mai terminato per avvio di altri progetti</p>
+                        <p class="project-desc">Concept di social media per matching basato sugli interessi. Progetto non terminato ma esperienza utile.</p>
                         <div class="project-tags">
                             <span class="project-tag">JavaScript</span>
                             <span class="project-tag">Node.js</span>
@@ -587,116 +414,81 @@
                     </div>
                 </div>
 
-                <div class="project-card glass-card" data-category="web" data-reveal data-tilt>
+                <div class="project-card">
                     <div class="project-image-real">
-                        <img src="assets/fotoPC_Monitor.png" alt="PC Workstation" loading="lazy">
-                        <div class="project-image-overlay"></div>
-                        <div class="project-overlay">
-                            <a href="#" class="project-link">
-                                <i data-lucide="external-link"></i>
-                            </a>
-                        </div>
+                        <img src="assets/fotoPC_Monitor.png" alt="PC Monitor App">
                     </div>
                     <div class="project-content">
-                        <h3 class="project-title">Pc Monitor</h3>
-                        <p class="project-desc">Applicazione per la gestione e la monitorizzazione dei componenti del proprio pc</p>
+                        <h3 class="project-title">PC Monitor</h3>
+                        <p class="project-desc">Applicazione desktop per monitorare temperatura e performance del PC in tempo reale.</p>
                         <div class="project-tags">
                             <span class="project-tag">Python</span>
                             <span class="project-tag">JavaScript</span>
-                            <span class="project-tag">SQL</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- CONTACT / FOOTER SECTION -->
         <section id="contact" class="contact">
-            <div class="contact-bg" id="contactBg"></div>
-            
             <div class="contact-container">
                 <div class="contact-content">
-                    <div class="section-header" data-reveal>
+                    <div class="section-header">
                         <span class="section-eyebrow">Contatti</span>
-                        <h2 class="section-title">Lavoriamo Insieme</h2>
+                        <h2 class="section-title">Lavoriamo insieme</h2>
                         <p class="section-subtitle">
-                            Hai un progetto in mente? Parliamone e trasformiamo le tue idee in realtà.
+                            Hai un progetto in mente? Scrivimi e parliamone.
                         </p>
                     </div>
-                    
-                    <div class="contact-methods" data-reveal>
-                        <a href="mailto:developer@example.com" class="contact-method">
-                            <div class="contact-icon">
-                                <i data-lucide="mail"></i>
-                            </div>
+
+                    <div class="contact-methods">
+                        <a href="mailto:enryyyioriox@outlook.it" class="contact-method">
+                            <div class="contact-icon">@</div>
                             <div class="contact-info">
                                 <span class="contact-label">Email</span>
                                 <span class="contact-value">enryyyioriox@outlook.it</span>
                             </div>
                         </a>
-                        
-                        <a href="#" class="contact-method">
-                            <div class="contact-icon">
-                                <i data-lucide="map-pin"></i>
-                            </div>
+
+                        <div class="contact-method">
+                            <div class="contact-icon">📍</div>
                             <div class="contact-info">
                                 <span class="contact-label">Location</span>
                                 <span class="contact-value">Roma, Italia</span>
                             </div>
-                        </a>
-                        
-                        <a href="#" class="contact-method">
-                            <div class="contact-icon">
-                                <i data-lucide="calendar"></i>
-                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-icon">🕐</div>
                             <div class="contact-info">
-                                <span class="contact-label">Disponibilità</span>
-                                <span class="contact-value">Freelance / Full-time</span>
+                                <span class="contact-label">Disponibilita</span>
+                                <span class="contact-value">Freelance</span>
                             </div>
-                        </a>
+                        </div>
                     </div>
-                    
-                    <div class="contact-cta" data-reveal>
-                        <a href="mailto:enryyyioriox@outlook.it" class="btn btn-primary btn-large">
-                            <span class="btn-text">Inviami un Messaggio</span>
-                            <span class="btn-icon">
-                                <i data-lucide="send"></i>
-                            </span>
-                        </a>
-                    </div>
+
+                    <a href="mailto:enryyyioriox@outlook.it" class="btn btn-primary btn-large">Scrivimi un'email</a>
                 </div>
-                
-                <div class="contact-social" data-reveal>
-                    <span class="social-label">Seguimi su</span>
+
+                <div class="contact-social">
+                    <span class="social-label">Seguimi</span>
                     <div class="social-links">
-                        <a href="https://github.com/redmi10enrico-spec" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                        </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Discord">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7c-3 0-4 3-4 3v7c0 1 1 2 2 2h1v-3"/><path d="M15 7c3 0 4 3 4 3v7c0 1-1 2-2 2h-1v-3"/><circle cx="12" cy="12" r="1"/><path d="M8 11v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/></svg>
-                        </a>
-                        <a href="https://www.instagram.com/enryyy_iorio" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                        </a>
-                        <a href="https://www.tiktok.com/@enrico0077" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                        </a>
+                        <a href="https://github.com/redmi10enrico-spec" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">GH</a>
+                        <a href="https://www.instagram.com/enryyy_iorio" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">IG</a>
+                        <a href="https://www.tiktok.com/@enrico0077" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">TK</a>
                     </div>
                 </div>
             </div>
-            
+
             <footer class="footer">
                 <div class="footer-content">
                     <div class="footer-logo">
                         <span class="logo-bracket">&lt;</span>
-                        <span class="logo-text">DEV</span>
+                        <span class="logo-text">EI</span>
                         <span class="logo-bracket">/&gt;</span>
                     </div>
                     <p class="footer-copy">
-                        &copy; 2026 Full Stack Developer. Tutti i diritti riservati.
-                    </p>
-                    <p class="footer-craft">
-                        Creato con il <i data-lucide="heart" class="footer-heart"></i> e codice.
+                        &copy; 2026 Enrico Iorio — Front-End Developer
                     </p>
                 </div>
             </footer>
