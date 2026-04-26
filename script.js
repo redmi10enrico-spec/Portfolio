@@ -1,5 +1,102 @@
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+const isLowEndDevice = navigator.hardwareConcurrency <= 4 || navigator.deviceMemory <= 4;
+
+// Utility: Throttle function
+const throttle = (func, limit) => {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+};
+
+// Utility: RAF throttle
+const rafThrottle = (callback) => {
+    let ticking = false;
+    return function(...args) {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                callback.apply(this, args);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
+};
+
+const PerformanceManager = {
+    fps: 60,
+    frameCount: 0,
+    lastTime: performance.now(),
+    isPerformanceMode: false,
+    heavyEffectsDisabled: false,
+
+    init() {
+        if (isLowEndDevice) {
+            this.enablePerformanceMode();
+        }
+        this.monitorFPS();
+    },
+
+    monitorFPS() {
+        const checkFPS = () => {
+            this.frameCount++;
+            const currentTime = performance.now();
+            const elapsed = currentTime - this.lastTime;
+
+            if (elapsed >= 1000) {
+                this.fps = Math.round((this.frameCount * 1000) / elapsed);
+                this.frameCount = 0;
+                this.lastTime = currentTime;
+
+                if (this.fps < 30 && !this.heavyEffectsDisabled) {
+                    this.disableHeavyEffects();
+                }
+            }
+
+            requestAnimationFrame(checkFPS);
+        };
+
+        if (!prefersReducedMotion) {
+            requestAnimationFrame(checkFPS);
+        }
+    },
+
+    enablePerformanceMode() {
+        this.isPerformanceMode = true;
+        document.body.classList.add('performance-mode');
+        // Disable complex background
+        const bgParticles = document.querySelector('.bg-particles');
+        if (bgParticles) bgParticles.style.display = 'none';
+    },
+
+    disableHeavyEffects() {
+        this.heavyEffectsDisabled = true;
+        document.body.classList.add('low-fps-mode');
+
+        // Disable particles
+        BackgroundParticles.destroy?.();
+
+        // Disable complex cursor
+        CustomCursor.destroy?.();
+
+        // Simplify animations
+        document.querySelectorAll('.bg-orb, .bg-gradient-alt').forEach(el => {
+            el.style.animation = 'none';
+            el.style.opacity = '0.2';
+        });
+    },
+
+    getQualityLevel() {
+        if (this.heavyEffectsDisabled || this.isPerformanceMode) return 'low';
+        if (this.fps < 45) return 'medium';
+        return 'high';
+    }
+};
 const Loader = {
     init() {
         const loader = document.getElementById('loader');
@@ -119,10 +216,13 @@ const BackgroundParticles = {
     particles: [],
     rafId: null,
     isActive: true,
+    isInViewport: true,
     mouse: { x: 0, y: 0 },
+    frameSkip: 0,
+    frameCount: 0,
 
     init() {
-        if (prefersReducedMotion) return;
+        if (prefersReducedMotion || isLowEndDevice) return;
 
         this.canvas = document.createElement('canvas');
         this.canvas.className = 'bg-particles';
@@ -131,13 +231,16 @@ const BackgroundParticles = {
         this.ctx = this.canvas.getContext('2d', { alpha: true, desynchronized: true });
         this.resize();
 
-        const particleCount = isTouchDevice ? 10 : 20;
+        // Adaptive particle count based on device
+        const baseCount = isTouchDevice ? 8 : (PerformanceManager.getQualityLevel?.() === 'high' ? 15 : 10);
+        const particleCount = Math.min(baseCount, 15);
+
         for (let i = 0; i < particleCount; i++) {
             this.particles.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.2,
-                vy: (Math.random() - 0.5) * 0.2,
+                vx: (Math.random() - 0.5) * 0.15,
+                vy: (Math.random() - 0.5) * 0.15,
                 size: Math.random() * 1.5 + 0.5,
                 opacity: Math.random() * 0.4 + 0.1,
                 pulse: Math.random() * Math.PI
@@ -150,15 +253,23 @@ const BackgroundParticles = {
             resizeTimeout = setTimeout(() => this.resize(), 200);
         }, { passive: true });
 
-        document.addEventListener('mousemove', (e) => {
+        // Throttled mouse tracking
+        document.addEventListener('mousemove', throttle((e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
-        }, { passive: true });
+        }, 50), { passive: true });
 
+        // Pause when tab hidden
         document.addEventListener('visibilitychange', () => {
             this.isActive = document.visibilityState === 'visible';
             if (this.isActive && !this.rafId) this.animate();
         });
+
+        // Use IntersectionObserver to pause when not visible
+        const observer = new IntersectionObserver((entries) => {
+            this.isInViewport = entries[0]?.isIntersecting ?? true;
+        }, { threshold: 0 });
+        observer.observe(this.canvas);
 
         this.animate();
     },
@@ -173,14 +284,23 @@ const BackgroundParticles = {
     },
 
     animate() {
-        if (!this.isActive) {
+        if (!this.isActive || !this.isInViewport) {
             this.rafId = null;
+            return;
+        }
+
+        this.frameCount++;
+        // Skip frames on lower quality
+        const skipRate = PerformanceManager.getQualityLevel?.() === 'low' ? 2 : 1;
+        if (this.frameCount % skipRate !== 0) {
+            this.rafId = requestAnimationFrame(() => this.animate());
             return;
         }
 
         this.ctx.clearRect(0, 0, this.canvas.width / window.devicePixelRatio, this.canvas.height / window.devicePixelRatio);
 
         const time = Date.now() * 0.001;
+        const quality = PerformanceManager.getQualityLevel?.() || 'medium';
 
         for (let i = 0; i < this.particles.length; i++) {
             const p = this.particles[i];
@@ -188,18 +308,24 @@ const BackgroundParticles = {
             p.x += p.vx;
             p.y += p.vy;
 
-            const dx = this.mouse.x - p.x;
-            const dy = this.mouse.y - p.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 150) {
-                p.vx -= dx * 0.0001;
-                p.vy -= dy * 0.0001;
+            // Only calculate mouse interaction on high quality
+            if (quality === 'high') {
+                const dx = this.mouse.x - p.x;
+                const dy = this.mouse.y - p.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 100) {
+                    p.vx -= dx * 0.0001;
+                    p.vy -= dy * 0.0001;
+                }
             }
 
-            if (p.x < 0) p.x = this.canvas.width / window.devicePixelRatio;
-            if (p.x > this.canvas.width / window.devicePixelRatio) p.x = 0;
-            if (p.y < 0) p.y = this.canvas.height / window.devicePixelRatio;
-            if (p.y > this.canvas.height / window.devicePixelRatio) p.y = 0;
+            // Wrap around edges
+            const w = this.canvas.width / window.devicePixelRatio;
+            const h = this.canvas.height / window.devicePixelRatio;
+            if (p.x < 0) p.x = w;
+            if (p.x > w) p.x = 0;
+            if (p.y < 0) p.y = h;
+            if (p.y > h) p.y = 0;
 
             const pulseOpacity = p.opacity * (0.7 + 0.3 * Math.sin(time + p.pulse));
 
@@ -208,19 +334,22 @@ const BackgroundParticles = {
             this.ctx.fillStyle = `rgba(122, 0, 255, ${pulseOpacity})`;
             this.ctx.fill();
 
-            for (let j = i + 1; j < this.particles.length; j++) {
-                const p2 = this.particles[j];
-                const dx2 = p.x - p2.x;
-                const dy2 = p.y - p2.y;
-                const dist2 = dx2 * dx2 + dy2 * dy2;
+            // Skip connections on low quality or every other frame
+            if (quality !== 'low' && i % 2 === 0) {
+                for (let j = i + 1; j < this.particles.length; j += 2) {
+                    const p2 = this.particles[j];
+                    const dx2 = p.x - p2.x;
+                    const dy2 = p.y - p2.y;
+                    const dist2 = dx2 * dx2 + dy2 * dy2;
 
-                if (dist2 < 8100) {
-                    const d = Math.sqrt(dist2);
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(p.x, p.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.strokeStyle = `rgba(122, 0, 255, ${0.08 * (1 - d / 90)})`;
-                    this.ctx.stroke();
+                    if (dist2 < 6400) { // Reduced from 8100
+                        const d = Math.sqrt(dist2);
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(p2.x, p2.y);
+                        this.ctx.strokeStyle = `rgba(122, 0, 255, ${0.06 * (1 - d / 80)})`;
+                        this.ctx.stroke();
+                    }
                 }
             }
         }
@@ -254,9 +383,11 @@ const ScrollProgress = {
 
 const MagneticButtons = {
     buttons: new Map(),
+    rafId: null,
+    isActive: true,
 
     init() {
-        if (prefersReducedMotion || isTouchDevice) return;
+        if (prefersReducedMotion || isTouchDevice || isLowEndDevice) return;
 
         const buttons = document.querySelectorAll('.btn, .social-link');
         buttons.forEach(btn => {
@@ -265,16 +396,23 @@ const MagneticButtons = {
             this.bindEvents(btn);
         });
 
+        // Pause when tab hidden
+        document.addEventListener('visibilitychange', () => {
+            this.isActive = document.visibilityState === 'visible';
+            if (this.isActive && !this.rafId) this.animate();
+        });
+
         this.animate();
     },
 
     bindEvents(btn) {
-        btn.addEventListener('mousemove', (e) => {
+        // Throttled at 60fps
+        btn.addEventListener('mousemove', throttle((e) => {
             const rect = btn.getBoundingClientRect();
             const state = this.buttons.get(btn);
             state.targetX = (e.clientX - rect.left - rect.width / 2) * 0.3;
             state.targetY = (e.clientY - rect.top - rect.height / 2) * 0.3;
-        });
+        }, 16));
 
         btn.addEventListener('mouseleave', () => {
             const state = this.buttons.get(btn);
@@ -284,23 +422,35 @@ const MagneticButtons = {
     },
 
     animate() {
+        if (!this.isActive) {
+            this.rafId = null;
+            return;
+        }
+
+        let hasMovement = false;
         this.buttons.forEach((state, btn) => {
             state.x += (state.targetX - state.x) * 0.15;
             state.y += (state.targetY - state.y) * 0.15;
 
             if (Math.abs(state.x) > 0.01 || Math.abs(state.y) > 0.01) {
                 btn.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
-            } else {
+                hasMovement = true;
+            } else if (state.x !== 0 || state.y !== 0) {
                 btn.style.transform = 'translate3d(0, 0, 0)';
+                state.x = 0;
+                state.y = 0;
             }
         });
 
-        requestAnimationFrame(() => this.animate());
+        // Only continue animation if there's movement
+        this.rafId = requestAnimationFrame(() => this.animate());
     }
 };
 
 const TiltCards = {
     cards: new Map(),
+    rafId: null,
+    isActive: true,
 
     init() {
         if (prefersReducedMotion || isTouchDevice) return;
@@ -308,49 +458,71 @@ const TiltCards = {
         const cards = document.querySelectorAll('.skill-card, .project-card, .work-card');
         cards.forEach(card => {
             card.classList.add('tilt-card');
-            this.cards.set(card, { rotateX: 0, rotateY: 0, targetX: 0, targetY: 0 });
+            this.cards.set(card, { rotateX: 0, rotateY: 0, targetX: 0, targetY: 0, isHovering: false });
             this.bindEvents(card);
+        });
+
+        // Pause when tab hidden
+        document.addEventListener('visibilitychange', () => {
+            this.isActive = document.visibilityState === 'visible';
+            if (this.isActive && !this.rafId) this.animate();
         });
 
         this.animate();
     },
 
     bindEvents(card) {
-        const updateTilt = (e) => {
+        const state = this.cards.get(card);
+
+        // Throttled tilt update
+        card.addEventListener('mousemove', throttle((e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
 
-            const state = this.cards.get(card);
             state.targetX = ((y - centerY) / centerY) * -8;
             state.targetY = ((x - centerX) / centerX) * 8;
-        };
+            state.isHovering = true;
+        }, 16));
 
-        const resetTilt = () => {
-            const state = this.cards.get(card);
+        card.addEventListener('mouseleave', () => {
             state.targetX = 0;
             state.targetY = 0;
-        };
+            state.isHovering = false;
+        });
 
-        card.addEventListener('mousemove', updateTilt, { passive: true });
-        card.addEventListener('mouseleave', resetTilt);
+        card.addEventListener('mouseenter', () => {
+            state.isHovering = true;
+        });
     },
 
     animate() {
-        this.cards.forEach((state, card) => {
-            state.rotateX += (state.targetX - state.rotateX) * 0.1;
-            state.rotateY += (state.targetY - state.rotateY) * 0.1;
+        if (!this.isActive) {
+            this.rafId = null;
+            return;
+        }
 
-            if (Math.abs(state.rotateX) > 0.01 || Math.abs(state.rotateY) > 0.01) {
-                card.style.transform = `perspective(1000px) rotateX(${state.rotateX}deg) rotateY(${state.rotateY}deg) translateZ(20px)`;
+        this.cards.forEach((state, card) => {
+            state.rotateX += (state.targetX - state.rotateX) * 0.15;
+            state.rotateY += (state.targetY - state.rotateY) * 0.15;
+
+            const absX = Math.abs(state.rotateX);
+            const absY = Math.abs(state.rotateY);
+
+            if (absX > 0.01 || absY > 0.01 || state.isHovering) {
+                card.style.setProperty('--tilt-x', `${state.rotateX}deg`);
+                card.style.setProperty('--tilt-y', `${state.rotateY}deg`);
+                card.classList.add('tilting');
             } else {
-                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                card.classList.remove('tilting');
+                state.rotateX = 0;
+                state.rotateY = 0;
             }
         });
 
-        requestAnimationFrame(() => this.animate());
+        this.rafId = requestAnimationFrame(() => this.animate());
     }
 };
 
@@ -423,9 +595,10 @@ const MicroParallax = {
     mouseY: 0,
     targetX: 0,
     targetY: 0,
+    rafId: null,
 
     init() {
-        if (prefersReducedMotion || isTouchDevice) return;
+        if (prefersReducedMotion || isTouchDevice || isLowEndDevice) return;
 
         this.elements = Array.from(document.querySelectorAll('.section-header, .hero-badge, .bio-experience-badge')).map(el => ({
             element: el,
@@ -436,25 +609,40 @@ const MicroParallax = {
 
         if (this.elements.length === 0) return;
 
-        document.addEventListener('mousemove', (e) => {
+        // Throttled mouse tracking - 60fps max
+        document.addEventListener('mousemove', throttle((e) => {
             this.targetX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
             this.targetY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
-        }, { passive: true });
+        }, 16), { passive: true });
 
         this.animate();
     },
 
     animate() {
+        // Skip frames if tab not visible
+        if (document.hidden) {
+            this.rafId = requestAnimationFrame(() => this.animate());
+            return;
+        }
+
         this.mouseX += (this.targetX - this.mouseX) * 0.1;
         this.mouseY += (this.targetY - this.mouseY) * 0.1;
 
-        this.elements.forEach(item => {
-            const offsetX = this.mouseX * item.speed * -30;
-            const offsetY = this.mouseY * item.speed * -30;
-            item.element.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+        // Batch DOM updates
+        const transforms = this.elements.map(item => ({
+            el: item.element,
+            transform: `translate3d(${this.mouseX * item.speed * -30}px, ${this.mouseY * item.speed * -30}px, 0)`
+        }));
+
+        transforms.forEach(({ el, transform }) => {
+            el.style.transform = transform;
         });
 
-        requestAnimationFrame(() => this.animate());
+        this.rafId = requestAnimationFrame(() => this.animate());
+    },
+
+    destroy() {
+        if (this.rafId) cancelAnimationFrame(this.rafId);
     }
 };
 
@@ -524,30 +712,171 @@ const Navigation = {
     }
 };
 
+// Counter Animation
+const CounterAnimation = {
+    init() {
+        const counters = document.querySelectorAll('.stat-number');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    this.animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => observer.observe(counter));
+    },
+
+    animateCounter(element) {
+        const text = element.textContent;
+        const num = parseInt(text);
+        const suffix = text.replace(/[0-9]/g, '');
+        const duration = 1500;
+        const startTime = performance.now();
+
+        const update = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(num * easeProgress);
+            element.textContent = current + suffix;
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        };
+
+        requestAnimationFrame(update);
+    }
+};
+
+// Spotlight Effect
+const SpotlightEffect = {
+    init() {
+        if (isTouchDevice || prefersReducedMotion) return;
+
+        const elements = document.querySelectorAll('.project-card, .skill-card, .work-card');
+        elements.forEach(el => {
+            el.classList.add('spotlight');
+            el.addEventListener('mousemove', throttle((e) => {
+                const rect = el.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                el.style.setProperty('--x', `${x}%`);
+                el.style.setProperty('--y', `${y}%`);
+            }, 16));
+        });
+    }
+};
+
+// Magnetic Text Effect
+const MagneticText = {
+    init() {
+        if (isTouchDevice || prefersReducedMotion) return;
+
+        const titles = document.querySelectorAll('.project-title, .skill-name');
+        titles.forEach(title => {
+            title.classList.add('magnetic-text');
+            title.addEventListener('mousemove', throttle((e) => {
+                const rect = title.getBoundingClientRect();
+                const x = (e.clientX - rect.left - rect.width / 2) * 0.1;
+                const y = (e.clientY - rect.top - rect.height / 2) * 0.1;
+                title.style.transform = `translate(${x}px, ${y}px)`;
+            }, 16));
+
+            title.addEventListener('mouseleave', () => {
+                title.style.transform = 'translate(0, 0)';
+            });
+        });
+    }
+};
+
+// Staggered Reveal for Lists
+const StaggeredReveal = {
+    init() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const items = entry.target.querySelectorAll('.project-card, .skill-card, .work-item');
+                    items.forEach((item, i) => {
+                        setTimeout(() => {
+                            item.classList.add('visible');
+                        }, i * 100);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.projects-grid, .skills-grid, .works-timeline').forEach(grid => {
+            grid.classList.add('stagger-container');
+            observer.observe(grid);
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    PerformanceManager.init();
     Loader.init();
     Navigation.init();
 
-    CustomCursor.init();
-    BackgroundParticles.init();
-    ScrollProgress.init();
-    MagneticButtons.init();
+    // Heavy effects only if not low-end
+    if (!isLowEndDevice) {
+        CustomCursor.init();
+        BackgroundParticles.init();
+        MagneticButtons.init();
+        MicroParallax.init();
+        SpotlightEffect.init();
+        MagneticText.init();
+    }
+
+    // Tilt effect always enabled (unless touch/reduced motion)
     TiltCards.init();
+
+    ScrollProgress.init();
     RippleEffect.init();
     ParallaxImages.init();
     RevealOnScroll.init();
     CardReveal.init();
-    MicroParallax.init();
     GlowEffects.init();
+    CounterAnimation.init();
+    StaggeredReveal.init();
 
+    // Apply animation classes
     document.querySelectorAll('.btn-primary').forEach(btn => {
-        btn.classList.add('hover-lift', 'glow-purple', 'glow-border');
+        btn.classList.add('hover-lift', 'glow-purple', 'glow-border', 'shake-hover');
     });
-    document.querySelectorAll('.project-card, .skill-card').forEach(card => {
-        card.classList.add('hover-lift', 'glow-border');
-    });
-    document.querySelectorAll('.bio-visual').forEach(el => el.classList.add('float'));
-    document.querySelectorAll('.contact-method').forEach(el => el.classList.add('micro-parallax'));
 
-    document.querySelector('.hero-badge')?.classList.add('pulse-glow');
+    document.querySelectorAll('.project-card, .skill-card').forEach((card, i) => {
+        card.classList.add('hover-lift', 'glow-border', 'border-rotate');
+        card.classList.add(`stagger-${(i % 5) + 1}`);
+    });
+
+    document.querySelectorAll('.bio-visual').forEach(el => el.classList.add('float'));
+    document.querySelectorAll('.contact-method').forEach(el => el.classList.add('micro-parallax', 'glow-pulse-scale'));
+    document.querySelectorAll('.stat-item').forEach(el => el.classList.add('bounce-in'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.add('slide-left'));
+    document.querySelectorAll('.section-subtitle').forEach(el => el.classList.add('slide-right'));
+
+    const heroBadge = document.querySelector('.hero-badge');
+    if (heroBadge) {
+        heroBadge.classList.add('pulse-glow', 'float-icon');
+    }
+
+    // Hero typing effect simulation
+    const heroTitle = document.querySelector('.title-highlight');
+    if (heroTitle && !prefersReducedMotion) {
+        heroTitle.classList.add('typing-text');
+        setTimeout(() => heroTitle.classList.remove('typing-text'), 3000);
+    }
+
+    // Safety timeout: force all animated elements visible after 4 seconds
+    setTimeout(() => {
+        document.querySelectorAll('.reveal-up:not(.visible), .bounce-in:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible), .rotate-in:not(.visible), .project-card:not(.visible), .skill-card:not(.visible), .work-item:not(.visible)').forEach(el => {
+            el.classList.add('visible');
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+    }, 4000);
 });
