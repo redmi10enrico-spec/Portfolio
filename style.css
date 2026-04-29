@@ -392,13 +392,11 @@ a {
     border: 1px solid var(--gray-800);
     border-radius: 12px;
     padding: 1.5rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.skill-card:hover {
-    border-color: var(--purple);
-    transform: translateY(-3px);
-}
 
 .skill-name {
     font-family: var(--font-display);
@@ -597,12 +595,10 @@ a {
     border: 1px solid var(--gray-800);
     border-radius: 12px;
     padding: 1.5rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
 }
 
-.work-card:hover {
-    border-color: var(--purple);
-}
 
 .work-period {
     font-family: var(--font-display);
@@ -707,11 +703,6 @@ a {
     overflow: visible;
 }
 
-.project-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--purple);
-    box-shadow: var(--shadow-glow);
-}
 
 .project-image-real {
     position: relative;
@@ -1050,51 +1041,99 @@ a {
 /* ============================================
    BACKGROUND EFFECTS
    ============================================ */
-.cursor-main,
-.cursor-trail {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
+*, *::before, *::after {
+    cursor: none !important;
 }
 
 .cursor-main {
-    width: 20px;
-    height: 20px;
-    background: var(--white);
-    border-radius: 50%;
+    position: fixed;
     top: 0;
     left: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--purple);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    box-shadow:
+        0 0 20px var(--purple),
+        0 0 40px var(--purple),
+        0 0 60px rgba(122, 0, 255, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.3);
+    transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, opacity 0.3s ease;
     will-change: transform;
-    transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
 }
 
 .cursor-main.hover {
     width: 50px;
     height: 50px;
-    background: var(--purple);
-    mix-blend-mode: normal;
+    background: var(--purple-light);
+    box-shadow:
+        0 0 30px var(--purple-light),
+        0 0 60px var(--purple),
+        0 0 90px rgba(122, 0, 255, 0.6),
+        inset 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
-.cursor-main.click {
+.cursor-main.clicking {
     width: 15px;
     height: 15px;
+    background: #fff;
+    box-shadow:
+        0 0 30px #fff,
+        0 0 60px var(--purple),
+        0 0 90px var(--purple);
 }
 
 .cursor-trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--purple);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--purple), 0 0 20px rgba(122, 0, 255, 0.5);
+    will-change: transform, opacity;
+}
+
+.burst-particle {
+    position: fixed;
     width: 8px;
     height: 8px;
     background: var(--purple);
     border-radius: 50%;
-    top: 0;
-    left: 0;
-    will-change: transform;
+    pointer-events: none;
+    z-index: 99997;
+    box-shadow: 0 0 10px var(--purple);
+    will-change: transform, opacity;
+}
+
+.click-ring {
+    position: fixed;
+    border: 2px solid var(--purple);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99996;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px var(--purple), inset 0 0 20px rgba(122, 0, 255, 0.3);
+    will-change: transform, opacity;
 }
 
 @media (pointer: coarse) {
     .cursor-main,
-    .cursor-trail {
+    .cursor-trail,
+    .burst-particle,
+    .click-ring {
         display: none !important;
+    }
+
+    *, *::before, *::after {
+        cursor: auto !important;
     }
 }
 
@@ -1461,30 +1500,7 @@ section {
     transition: all 0.5s ease;
 }
 
-/* Spotlight Effect */
-.spotlight {
-    position: relative;
-    overflow: hidden;
-}
-
-.spotlight::before {
-    content: '';
-    position: absolute;
-    top: var(--y, 50%);
-    left: var(--x, 50%);
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(122, 0, 255, 0.15) 0%, transparent 70%);
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    will-change: opacity, transform;
-}
-
-.spotlight:hover::before {
-    opacity: 1;
-}
+/* Spotlight Effect - REMOVED (using clean CSS hover effects instead) */
 
 /* Neon Flicker */
 .neon-flicker {
@@ -1501,42 +1517,6 @@ section {
     47% { opacity: 1; }
 }
 
-/* ============================================
-   PERFORMANCE MODE STYLES
-   ============================================ */
-.performance-mode .bg-particles,
-.performance-mode .cursor-main,
-.performance-mode .cursor-trail {
-    display: none !important;
-}
-
-.performance-mode .bg-orb,
-.low-fps-mode .bg-orb {
-    animation: none !important;
-    opacity: 0.1 !important;
-}
-
-.performance-mode .bg-gradient-alt,
-.low-fps-mode .bg-gradient-alt {
-    animation: none !important;
-}
-
-.low-fps-mode .bg-particles,
-.low-fps-mode .cursor-main,
-.low-fps-mode .cursor-trail {
-    display: none !important;
-}
-
-.low-fps-mode * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-}
-
-.low-fps-mode .project-card:hover,
-.low-fps-mode .skill-card:hover,
-.low-fps-mode .work-card:hover {
-    transform: none !important;
-}
 
 /* ============================================
    CSS CONTAINMENT FOR PERFORMANCE
@@ -1768,111 +1748,116 @@ section {
     opacity: 0.6;
 }
 
-/* Enhanced Project Cards */
-.project-card {
-    background: linear-gradient(145deg, var(--gray-900) 0%, rgba(26, 26, 26, 0.8) 100%);
-    border: 1px solid rgba(122, 0, 255, 0.15);
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    transform-style: preserve-3d;
-    position: relative;
-}
+/* ============================================
+   PREMIUM CARD HOVER EFFECTS - CLEAN & MINIMAL
+   ============================================ */
 
-.project-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(122, 0, 255, 0.3), rgba(168, 85, 247, 0.1), transparent 50%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-}
-
-.project-card:hover::before {
-    opacity: 1;
-}
-
-.project-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    border-color: rgba(122, 0, 255, 0.4);
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px rgba(122, 0, 255, 0.2),
-        0 0 80px rgba(122, 0, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* Enhanced Skill Cards */
-.skill-card {
-    background: linear-gradient(145deg, var(--gray-900) 0%, rgba(20, 20, 20, 0.9) 100%);
-    border: 1px solid rgba(122, 0, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.skill-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(122, 0, 255, 0.1), transparent);
-    transition: left 0.5s ease;
-}
-
-.skill-card:hover::after {
-    left: 100%;
-}
-
-.skill-card:hover {
-    border-color: rgba(122, 0, 255, 0.4);
-    transform: translateY(-5px);
-    box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.3),
-        0 0 30px rgba(122, 0, 255, 0.15);
-}
-
-/* Enhanced Work Cards */
+/* Base card style - all cards */
+.project-card,
+.skill-card,
 .work-card {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+/* Project Cards - Premium Glow Border + Subtle Lift */
+.project-card {
     background: linear-gradient(145deg, var(--gray-900) 0%, rgba(26, 26, 26, 0.9) 100%);
     border: 1px solid rgba(122, 0, 255, 0.1);
     border-radius: 16px;
-    padding: 1.75rem;
-    transition: all 0.4s ease;
-    position: relative;
+    overflow: hidden;
 }
 
-.work-card::before {
+/* Clean hover - just border color and lift */
+.project-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(122, 0, 255, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Image subtle brightness on hover */
+.project-card:hover .project-image-real img {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+}
+
+/* Skill Cards - Clean Border Accent */
+.skill-card {
+    background: linear-gradient(145deg, var(--gray-900) 0%, rgba(20, 20, 20, 0.9) 100%);
+    border: 1px solid rgba(122, 0, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+/* Left accent line */
+.skill-card::before {
     content: '';
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
     width: 3px;
     height: 0;
     background: linear-gradient(180deg, var(--purple), var(--purple-light));
-    border-radius: 3px 0 0 3px;
-    transition: height 0.4s ease;
+    border-radius: 0 2px 2px 0;
+    transition: height 0.35s ease, top 0.35s ease;
+    transform: translateY(-50%);
 }
 
-.work-card:hover::before {
-    height: 100%;
+.skill-card:hover {
+    border-color: rgba(122, 0, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.skill-card:hover::before {
+    height: 60%;
+}
+
+/* Skill name color shift */
+.skill-card:hover .skill-name {
+    color: var(--purple-light);
+    transition: color 0.3s ease;
+}
+
+/* Work Cards - Premium Left Border + Subtle Depth */
+.work-card {
+    background: linear-gradient(145deg, var(--gray-900) 0%, rgba(26, 26, 26, 0.9) 100%);
+    border: 1px solid rgba(122, 0, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+/* Persistent left accent bar */
+.work-card::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 0;
+    width: 3px;
+    height: 60%;
+    background: linear-gradient(180deg, transparent, var(--purple-light) 50%, transparent);
+    opacity: 0.6;
+    border-radius: 0 2px 2px 0;
+    transition: all 0.35s ease;
 }
 
 .work-card:hover {
     border-color: rgba(122, 0, 255, 0.3);
-    transform: translateX(5px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transform: translateX(4px);
+    box-shadow: -5px 5px 25px rgba(0, 0, 0, 0.35);
+}
+
+.work-card:hover::before {
+    opacity: 1;
+    height: 80%;
+    top: 10%;
+    background: linear-gradient(180deg, var(--purple), var(--purple-light) 50%, var(--purple));
+}
+
+/* Period text color enhancement */
+.work-card:hover .work-period {
+    color: var(--purple-light);
+    transition: color 0.3s ease;
 }
 
 /* Enhanced Section Headers */
@@ -2289,6 +2274,8 @@ section {
 
     .cursor-main,
     .cursor-trail,
+    .burst-particle,
+    .click-ring,
     .bg-particles,
     .bg-gradient,
     .bg-gradient-alt {

@@ -1,6 +1,5 @@
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-const isLowEndDevice = navigator.hardwareConcurrency <= 4 || navigator.deviceMemory <= 4;
 
 // Utility: Throttle function
 const throttle = (func, limit) => {
@@ -28,75 +27,6 @@ const rafThrottle = (callback) => {
     };
 };
 
-const PerformanceManager = {
-    fps: 60,
-    frameCount: 0,
-    lastTime: performance.now(),
-    isPerformanceMode: false,
-    heavyEffectsDisabled: false,
-
-    init() {
-        if (isLowEndDevice) {
-            this.enablePerformanceMode();
-        }
-        this.monitorFPS();
-    },
-
-    monitorFPS() {
-        const checkFPS = () => {
-            this.frameCount++;
-            const currentTime = performance.now();
-            const elapsed = currentTime - this.lastTime;
-
-            if (elapsed >= 1000) {
-                this.fps = Math.round((this.frameCount * 1000) / elapsed);
-                this.frameCount = 0;
-                this.lastTime = currentTime;
-
-                if (this.fps < 30 && !this.heavyEffectsDisabled) {
-                    this.disableHeavyEffects();
-                }
-            }
-
-            requestAnimationFrame(checkFPS);
-        };
-
-        if (!prefersReducedMotion) {
-            requestAnimationFrame(checkFPS);
-        }
-    },
-
-    enablePerformanceMode() {
-        this.isPerformanceMode = true;
-        document.body.classList.add('performance-mode');
-        // Disable complex background
-        const bgParticles = document.querySelector('.bg-particles');
-        if (bgParticles) bgParticles.style.display = 'none';
-    },
-
-    disableHeavyEffects() {
-        this.heavyEffectsDisabled = true;
-        document.body.classList.add('low-fps-mode');
-
-        // Disable particles
-        BackgroundParticles.destroy?.();
-
-        // Disable complex cursor
-        CustomCursor.destroy?.();
-
-        // Simplify animations
-        document.querySelectorAll('.bg-orb, .bg-gradient-alt').forEach(el => {
-            el.style.animation = 'none';
-            el.style.opacity = '0.2';
-        });
-    },
-
-    getQualityLevel() {
-        if (this.heavyEffectsDisabled || this.isPerformanceMode) return 'low';
-        if (this.fps < 45) return 'medium';
-        return 'high';
-    }
-};
 const Loader = {
     init() {
         const loader = document.getElementById('loader');
@@ -122,89 +52,234 @@ const Loader = {
 const CustomCursor = {
     cursor: null,
     trails: [],
-    mouseX: 0,
-    mouseY: 0,
-    cursorX: 0,
-    cursorY: 0,
+    mouseX: window.innerWidth / 2,
+    mouseY: window.innerHeight / 2,
+    cursorX: window.innerWidth / 2,
+    cursorY: window.innerHeight / 2,
     trailPositions: [],
+    config: {
+        trailCount: 12,
+        ease: 0.15,
+        trailEase: 0.25,
+        trailSpacing: 0.08,
+    },
     rafId: null,
-    isActive: false,
 
     init() {
         if (prefersReducedMotion || isTouchDevice) return;
 
+        this.createCursor();
+        this.createTrails();
+        this.bindEvents();
+        this.animate();
+
+        setTimeout(() => {
+            if (this.cursor) {
+                this.cursor.style.opacity = '1';
+            }
+            this.trails.forEach((trail, i) => {
+                setTimeout(() => {
+                    trail.style.opacity = trail.dataset.baseOpacity;
+                }, i * 30);
+            });
+        }, 100);
+    },
+
+    createCursor() {
         this.cursor = document.createElement('div');
         this.cursor.className = 'cursor-main';
         this.cursor.style.left = '0px';
         this.cursor.style.top = '0px';
         document.body.appendChild(this.cursor);
+    },
 
-        for (let i = 0; i < 5; i++) {
+    createTrails() {
+        for (let i = 0; i < this.config.trailCount; i++) {
             const trail = document.createElement('div');
             trail.className = 'cursor-trail';
-            trail.style.opacity = 0.5 - (i * 0.08);
             trail.style.left = '0px';
             trail.style.top = '0px';
+
+            const ratio = i / this.config.trailCount;
+            const size = 12 - (ratio * 8);
+            const opacity = 0.7 - (ratio * 0.5);
+
+            trail.style.width = size + 'px';
+            trail.style.height = size + 'px';
+            trail.style.opacity = '0';
+            trail.dataset.baseOpacity = opacity;
+
             document.body.appendChild(trail);
             this.trails.push(trail);
-            this.trailPositions.push({ x: 0, y: 0 });
+            this.trailPositions.push({
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2
+            });
         }
-
-        this.bindEvents();
-        this.isActive = true;
-        this.animate();
     },
 
     bindEvents() {
-        const updatePosition = (e) => {
+        document.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX;
             this.mouseY = e.clientY;
-        };
+        }, { passive: true });
 
-        document.addEventListener('mousemove', updatePosition, { passive: true });
-        document.addEventListener('mousedown', () => this.cursor?.classList.add('click'));
-        document.addEventListener('mouseup', () => this.cursor?.classList.remove('click'));
+        document.addEventListener('mousedown', (e) => {
+            this.cursor.classList.add('clicking');
+            this.createBurst(e.clientX, e.clientY);
+            this.createClickRing(e.clientX, e.clientY);
+        });
 
-        const hoverElements = document.querySelectorAll('a, button, .btn, .skill-card, .project-card, .work-card, input, textarea');
-        hoverElements.forEach(el => {
-            el.addEventListener('mouseenter', () => this.cursor?.classList.add('hover'));
-            el.addEventListener('mouseleave', () => this.cursor?.classList.remove('hover'));
+        document.addEventListener('mouseup', () => {
+            this.cursor.classList.remove('clicking');
+        });
+
+        const interactiveElements = document.querySelectorAll(
+            'a, button, .btn, .skill-card, .project-card, .work-card, input, textarea, .nav-link, .social-link, .mobile-link'
+        );
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                this.cursor.classList.add('hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                this.cursor.classList.remove('hover');
+            });
+        });
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('a, button, .btn, .skill-card, .project-card, .work-card, input, textarea, .nav-link, .social-link, .mobile-link')) {
+                this.cursor.classList.add('hover');
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest('a, button, .btn, .skill-card, .project-card, .work-card, input, textarea, .nav-link, .social-link, .mobile-link')) {
+                this.cursor.classList.remove('hover');
+            }
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                this.isActive = false;
+            if (document.hidden) {
+                cancelAnimationFrame(this.rafId);
             } else {
-                this.isActive = true;
                 this.animate();
             }
         });
+
+        window.addEventListener('resize', () => {
+            this.mouseX = window.innerWidth / 2;
+            this.mouseY = window.innerHeight / 2;
+        }, { passive: true });
+    },
+
+    createBurst(x, y) {
+        const particleCount = 8;
+        const colors = ['#7A00FF', '#A855F7', '#fff'];
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'burst-particle';
+            particle.style.left = '0px';
+            particle.style.top = '0px';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            document.body.appendChild(particle);
+
+            const angle = (i / particleCount) * Math.PI * 2;
+            const velocity = 80 + Math.random() * 60;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+
+            const startTime = performance.now();
+            const duration = 500 + Math.random() * 200;
+
+            const animateParticle = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                const currentX = x + tx * easeOut;
+                const currentY = y + ty * easeOut;
+                const opacity = 1 - progress;
+                const scale = 1 - (progress * 0.5);
+
+                particle.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%) scale(${scale})`;
+                particle.style.opacity = opacity;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateParticle);
+                } else {
+                    particle.remove();
+                }
+            };
+
+            requestAnimationFrame(animateParticle);
+        }
+    },
+
+    createClickRing(x, y) {
+        const ring = document.createElement('div');
+        ring.className = 'click-ring';
+        ring.style.left = '0px';
+        ring.style.top = '0px';
+        ring.style.width = '20px';
+        ring.style.height = '20px';
+        ring.style.opacity = '1';
+        document.body.appendChild(ring);
+
+        const startTime = performance.now();
+        const duration = 600;
+
+        const animateRing = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 2);
+
+            const size = 20 + easeOut * 100;
+            const opacity = 1 - easeOut;
+
+            ring.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+            ring.style.width = size + 'px';
+            ring.style.height = size + 'px';
+            ring.style.opacity = opacity;
+            ring.style.borderWidth = (2 - easeOut * 1.5) + 'px';
+
+            if (progress < 1) {
+                requestAnimationFrame(animateRing);
+            } else {
+                ring.remove();
+            }
+        };
+
+        requestAnimationFrame(animateRing);
     },
 
     animate() {
-        if (!this.isActive || !this.cursor) return;
+        this.cursorX += (this.mouseX - this.cursorX) * this.config.ease;
+        this.cursorY += (this.mouseY - this.cursorY) * this.config.ease;
 
-        this.cursorX += (this.mouseX - this.cursorX) * 0.12;
-        this.cursorY += (this.mouseY - this.cursorY) * 0.12;
-        this.cursor.style.transform = `translate3d(${this.cursorX}px, ${this.cursorY}px, 0) translate(-50%, -50%)`;
+        this.cursor.style.transform = `translate(${this.cursorX}px, ${this.cursorY}px) translate(-50%, -50%)`;
 
         for (let i = 0; i < this.trails.length; i++) {
+            const trail = this.trails[i];
+            const pos = this.trailPositions[i];
+
             const targetX = i === 0 ? this.cursorX : this.trailPositions[i - 1].x;
             const targetY = i === 0 ? this.cursorY : this.trailPositions[i - 1].y;
-            const ease = 0.25 - (i * 0.04);
 
-            this.trailPositions[i].x += (targetX - this.trailPositions[i].x) * ease;
-            this.trailPositions[i].y += (targetY - this.trailPositions[i].y) * ease;
+            const ease = this.config.trailEase - (i * this.config.trailSpacing);
 
-            this.trails[i].style.transform = `translate3d(${this.trailPositions[i].x}px, ${this.trailPositions[i].y}px, 0) translate(-50%, -50%)`;
+            pos.x += (targetX - pos.x) * ease;
+            pos.y += (targetY - pos.y) * ease;
+
+            trail.style.transform = `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`;
         }
 
         this.rafId = requestAnimationFrame(() => this.animate());
     },
 
     destroy() {
-        this.isActive = false;
-        if (this.rafId) cancelAnimationFrame(this.rafId);
+        cancelAnimationFrame(this.rafId);
         this.cursor?.remove();
         this.trails.forEach(t => t.remove());
     }
@@ -222,7 +297,7 @@ const BackgroundParticles = {
     frameCount: 0,
 
     init() {
-        if (prefersReducedMotion || isLowEndDevice) return;
+        if (prefersReducedMotion) return;
 
         this.canvas = document.createElement('canvas');
         this.canvas.className = 'bg-particles';
@@ -231,9 +306,8 @@ const BackgroundParticles = {
         this.ctx = this.canvas.getContext('2d', { alpha: true, desynchronized: true });
         this.resize();
 
-        // Adaptive particle count based on device
-        const baseCount = isTouchDevice ? 8 : (PerformanceManager.getQualityLevel?.() === 'high' ? 15 : 10);
-        const particleCount = Math.min(baseCount, 15);
+        // Particle count
+        const particleCount = 12;
 
         for (let i = 0; i < particleCount; i++) {
             this.particles.push({
@@ -289,18 +363,10 @@ const BackgroundParticles = {
             return;
         }
 
-        this.frameCount++;
-        // Skip frames on lower quality
-        const skipRate = PerformanceManager.getQualityLevel?.() === 'low' ? 2 : 1;
-        if (this.frameCount % skipRate !== 0) {
-            this.rafId = requestAnimationFrame(() => this.animate());
-            return;
-        }
 
         this.ctx.clearRect(0, 0, this.canvas.width / window.devicePixelRatio, this.canvas.height / window.devicePixelRatio);
 
         const time = Date.now() * 0.001;
-        const quality = PerformanceManager.getQualityLevel?.() || 'medium';
 
         for (let i = 0; i < this.particles.length; i++) {
             const p = this.particles[i];
@@ -308,15 +374,13 @@ const BackgroundParticles = {
             p.x += p.vx;
             p.y += p.vy;
 
-            // Only calculate mouse interaction on high quality
-            if (quality === 'high') {
-                const dx = this.mouse.x - p.x;
-                const dy = this.mouse.y - p.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 100) {
-                    p.vx -= dx * 0.0001;
-                    p.vy -= dy * 0.0001;
-                }
+            // Mouse interaction
+            const dx = this.mouse.x - p.x;
+            const dy = this.mouse.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+                p.vx -= dx * 0.0001;
+                p.vy -= dy * 0.0001;
             }
 
             // Wrap around edges
@@ -334,8 +398,8 @@ const BackgroundParticles = {
             this.ctx.fillStyle = `rgba(122, 0, 255, ${pulseOpacity})`;
             this.ctx.fill();
 
-            // Skip connections on low quality or every other frame
-            if (quality !== 'low' && i % 2 === 0) {
+            // Draw connections every other frame
+            if (i % 2 === 0) {
                 for (let j = i + 1; j < this.particles.length; j += 2) {
                     const p2 = this.particles[j];
                     const dx2 = p.x - p2.x;
@@ -387,7 +451,7 @@ const MagneticButtons = {
     isActive: true,
 
     init() {
-        if (prefersReducedMotion || isTouchDevice || isLowEndDevice) return;
+        if (prefersReducedMotion || isTouchDevice) return;
 
         const buttons = document.querySelectorAll('.btn, .social-link');
         buttons.forEach(btn => {
@@ -482,8 +546,8 @@ const TiltCards = {
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
 
-            state.targetX = ((y - centerY) / centerY) * -8;
-            state.targetY = ((x - centerX) / centerX) * 8;
+            state.targetX = ((y - centerY) / centerY) * -2;
+            state.targetY = ((x - centerX) / centerX) * 2;
             state.isHovering = true;
         }, 16));
 
@@ -598,7 +662,7 @@ const MicroParallax = {
     rafId: null,
 
     init() {
-        if (prefersReducedMotion || isTouchDevice || isLowEndDevice) return;
+        if (prefersReducedMotion || isTouchDevice) return;
 
         this.elements = Array.from(document.querySelectorAll('.section-header, .hero-badge, .bio-experience-badge')).map(el => ({
             element: el,
@@ -751,14 +815,19 @@ const CounterAnimation = {
     }
 };
 
-// Spotlight Effect
+// Spotlight Effect - Applied immediately to all cards
 const SpotlightEffect = {
     init() {
         if (isTouchDevice || prefersReducedMotion) return;
 
         const elements = document.querySelectorAll('.project-card, .skill-card, .work-card');
-        elements.forEach(el => {
+        elements.forEach((el, index) => {
+            // Add spotlight class immediately
             el.classList.add('spotlight');
+
+            // Add staggered animation delay for visual variety
+            el.style.setProperty('--spotlight-delay', `${index * 50}ms`);
+
             el.addEventListener('mousemove', throttle((e) => {
                 const rect = el.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -817,19 +886,18 @@ const StaggeredReveal = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    PerformanceManager.init();
     Loader.init();
     Navigation.init();
 
-    // Heavy effects only if not low-end
-    if (!isLowEndDevice) {
-        CustomCursor.init();
-        BackgroundParticles.init();
-        MagneticButtons.init();
-        MicroParallax.init();
-        SpotlightEffect.init();
-        MagneticText.init();
-    }
+    // Custom cursor always
+    CustomCursor.init();
+    
+    // Effects enabled (clean, minimal)
+    BackgroundParticles.init();
+    MagneticButtons.init();
+    MicroParallax.init();
+    // SpotlightEffect disabled - using clean CSS hover effects instead
+    MagneticText.init();
 
     // Tilt effect always enabled (unless touch/reduced motion)
     TiltCards.init();
@@ -843,14 +911,15 @@ document.addEventListener('DOMContentLoaded', () => {
     CounterAnimation.init();
     StaggeredReveal.init();
 
-    // Apply animation classes
+    // Apply clean button effects only
     document.querySelectorAll('.btn-primary').forEach(btn => {
-        btn.classList.add('hover-lift', 'glow-purple', 'glow-border', 'shake-hover');
+        btn.classList.add('hover-lift');
     });
 
-    document.querySelectorAll('.project-card, .skill-card').forEach((card, i) => {
-        card.classList.add('hover-lift', 'glow-border', 'border-rotate');
+    // Cards - clean premium effects only (CSS-based, no JS clutter)
+    document.querySelectorAll('.project-card, .skill-card, .work-card').forEach((card, i) => {
         card.classList.add(`stagger-${(i % 5) + 1}`);
+        card.style.overflow = 'hidden';
     });
 
     document.querySelectorAll('.bio-visual').forEach(el => el.classList.add('float'));
