@@ -889,20 +889,32 @@ a {
     height: 44px;
     background: var(--gray-900);
     border: 1px solid var(--gray-800);
-    border-radius: 8px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.875rem;
-    font-weight: 600;
+    text-decoration: none;
     color: var(--gray-400);
+    font-weight: 600;
+    font-size: 0.875rem;
     transition: all 0.3s ease;
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(0.4);
+    transition: filter 0.3s ease;
 }
 
 .social-link:hover {
     background: var(--purple);
     border-color: var(--purple);
     color: var(--white);
+}
+
+.social-link:hover .social-icon {
+    filter: brightness(0) invert(1);
 }
 
 /* Footer */
