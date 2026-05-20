@@ -49,6 +49,25 @@ const Loader = {
     }
 };
 
+const Carousel = {
+    track: null,
+    isAnimating: false,
+    
+    init() {
+        this.track = document.querySelector('.carousel-track');
+        if (!this.track) return;
+        
+        // Setup carousel infinite loop
+        this.track.addEventListener('animationiteration', () => {
+            // When animation completes, reset to start
+            this.track.style.animation = 'none';
+            setTimeout(() => {
+                this.track.style.animation = '';
+            }, 50);
+        });
+    }
+};
+
 const CustomCursor = {
     cursor: null,
     trails: [],
@@ -888,6 +907,9 @@ const StaggeredReveal = {
 document.addEventListener('DOMContentLoaded', () => {
     Loader.init();
     Navigation.init();
+    
+    // Carousel initialization
+    Carousel.init();
 
     // Custom cursor always
     CustomCursor.init();
